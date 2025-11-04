@@ -71,11 +71,7 @@ Fishy Dex is a web-based application designed for fish enthusiasts, marine biolo
 
    **Environment Variable Details:**
 
-   - `BETTER_AUTH_SECRET`: Secret key used for signing tokens and encrypting session data. **Important:** Change this to a secure random string in production. You can generate one using:
-
-     ```bash
-     openssl rand -base64 32
-     ```
+   - `BETTER_AUTH_SECRET`: Secret key used for signing tokens and encrypting session data. **Important:** Change this to a secure random string in production.
 
    - `BETTER_AUTH_URL`: The base URL where your application is accessible. Use `http://localhost:3000` for local development, and update to your production domain when deploying.
 
@@ -90,8 +86,6 @@ Fishy Dex is a web-based application designed for fish enthusiasts, marine biolo
 4. **Set up the database**
 
    ```bash
-   # Generate migration files
-   npm run db:generate
 
    # Run migrations
    npm run db:migrate
