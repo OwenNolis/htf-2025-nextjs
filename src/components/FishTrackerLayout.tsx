@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { UserInfo } from "./AuthProvider";
 import FishTrackerClient from "./FishTrackerClient";
 import { Fish } from "@/types/fish";
@@ -24,7 +25,16 @@ export default function FishTrackerLayout({ fishes, sortedFishes }: FishTrackerL
           <div className="text-xs text-text-secondary font-mono">
             GLOBAL MARINE MONITORING SYSTEM
           </div>
+
+          {/* 🐠 Catalog Link */}
+          <Link
+            href="/catalog"
+            className="text-xs font-mono text-sonar-green hover:text-sonar-light transition-colors border border-panel-border rounded px-2 py-1 shadow-[--shadow-cockpit-border]"
+          >
+            CATALOG
+          </Link>
         </div>
+
         <div className="flex items-center gap-4 text-xs font-mono">
           <div className="border border-panel-border shadow-[--shadow-cockpit-border] px-3 py-1 rounded">
             <span className="text-sonar-green">STATUS:</span>
@@ -32,9 +42,7 @@ export default function FishTrackerLayout({ fishes, sortedFishes }: FishTrackerL
           </div>
           <div className="border border-panel-border shadow-[--shadow-cockpit-border] px-3 py-1 rounded">
             <span className="text-text-secondary">TARGETS:</span>
-            <span className="text-sonar-green ml-2 font-bold">
-              {fishes.length}
-            </span>
+            <span className="text-sonar-green ml-2 font-bold">{fishes.length}</span>
           </div>
           <div className="border border-panel-border shadow-[--shadow-cockpit-border] px-3 py-1 rounded">
             <UserInfo />
@@ -42,7 +50,7 @@ export default function FishTrackerLayout({ fishes, sortedFishes }: FishTrackerL
         </div>
       </div>
 
-      {/* Map and Fish List with shared hover state */}
+      {/* Map and Fish List */}
       <FishTrackerClient fishes={fishes} sortedFishes={sortedFishes} />
     </div>
   );
