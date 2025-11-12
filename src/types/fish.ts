@@ -15,6 +15,7 @@ export interface Fish {
   firstSpottedAt?: string;
   lastSpottedAt?: string;
   userSightings?: UserFishSighting[];
+  userImages?: UserFishImage[];
 }
 
 export type Rarity = "COMMON" | "RARE" | "EPIC";
@@ -29,5 +30,16 @@ export interface UserFishSighting {
   latitude?: string;
   longitude?: string;
   sightingDate: string;
+  createdAt: string;
+}
+
+// User Fish Image interface
+export interface UserFishImage {
+  id: string;
+  userId: string;
+  fishId: string;
+  imageUrl: string;
+  caption?: string;
+  takenAt?: string;
   createdAt: string;
 }

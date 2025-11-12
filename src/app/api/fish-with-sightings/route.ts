@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
-import { userFishSighting } from "@/db/schema";
+import { userFishSighting, userFishImage } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { Fish, UserFishSighting } from "@/types/fish";
+import { Fish, UserFishSighting, UserFishImage } from "@/types/fish";
 
 export async function GET(request: NextRequest) {
   try {
@@ -28,6 +28,12 @@ export async function GET(request: NextRequest) {
           .from(userFishSighting)
           .where(eq(userFishSighting.userId, session.user.id));
 
+        // Fetch user's fish images from local database
+        const userImages = await db
+          .select()
+          .from(userFishImage)
+          .where(eq(userFishImage.userId, session.user.id));
+
         // Group sightings by fishId and handle both old and new formats
         const sightingsMap = new Map<string, UserFishSighting[]>();
         userSightings.forEach(sighting => {
@@ -50,9 +56,29 @@ export async function GET(request: NextRequest) {
           });
         });
 
+        // Group images by fishId
+        const imagesMap = new Map<string, UserFishImage[]>();
+        userImages.forEach(image => {
+          const fishId = image.fishId;
+          if (!imagesMap.has(fishId)) {
+            imagesMap.set(fishId, []);
+          }
+          
+          imagesMap.get(fishId)!.push({
+            id: image.id,
+            userId: image.userId,
+            fishId: image.fishId,
+            imageUrl: image.imageUrl,
+            caption: image.caption || undefined,
+            takenAt: image.takenAt?.toISOString() || undefined,
+            createdAt: image.createdAt.toISOString(),
+          });
+        });
+
         // Merge fish data with sighting status
         const fishesWithSightings = fishes.map(fish => {
           const fishSightings = sightingsMap.get(fish.id) || [];
+          const fishImages = imagesMap.get(fish.id) || [];
           const isSpotted = fishSightings.length > 0;
           
           if (isSpotted) {
@@ -68,12 +94,14 @@ export async function GET(request: NextRequest) {
               firstSpottedAt: sortedSightings[0].sightingDate,
               lastSpottedAt: sortedSightings[sortedSightings.length - 1].sightingDate,
               userSightings: fishSightings,
+              userImages: fishImages,
             };
           } else {
             return {
               ...fish,
               isSpotted: false,
               sightingCount: 0,
+              userImages: fishImages,
             };
           }
         });

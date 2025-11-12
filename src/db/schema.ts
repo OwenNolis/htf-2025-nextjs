@@ -67,3 +67,16 @@ export const userFishSighting = sqliteTable("user_fish_sighting", {
   spottedAt: integer("spottedAt", { mode: "timestamp" }), // Legacy field for migration compatibility
   createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
 });
+
+// User fish images table - stores user-uploaded images for fish
+export const userFishImage = sqliteTable("user_fish_image", {
+  id: text("id").primaryKey(),
+  userId: text("userId")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  fishId: text("fishId").notNull(), // Fish ID from external API
+  imageUrl: text("imageUrl").notNull(), // URL or path to the uploaded image
+  caption: text("caption"), // Optional caption for the image
+  takenAt: integer("takenAt", { mode: "timestamp" }), // When the photo was taken
+  createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
+});

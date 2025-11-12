@@ -20,6 +20,8 @@ export default function FishDetailModal({ fish, isOpen, onClose, onFishUpdate }:
   const [localFish, setLocalFish] = useState<Fish | null>(fish);
   const [mounted, setMounted] = useState(false);
   const [showNewSightingForm, setShowNewSightingForm] = useState(false);
+  const [showImageUploadForm, setShowImageUploadForm] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { addSighting, isLoading } = useFishSightings();
 
   useEffect(() => {
@@ -83,6 +85,66 @@ export default function FishDetailModal({ fish, isOpen, onClose, onFishUpdate }:
     }
   };
 
+  const handleAddImage = async (imageUrl: string, caption?: string, takenAt?: Date) => {
+    if (!localFish) return;
+    
+    try {
+      const response = await fetch('/api/user-fish-images', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fishId: localFish.id,
+          imageUrl,
+          caption,
+          takenAt: takenAt?.toISOString()
+        }),
+      });
+
+      if (response.ok) {
+        // Refresh the fish data
+        const fishResponse = await fetch('/api/fish-with-sightings');
+        if (fishResponse.ok) {
+          const updatedFishes = await fishResponse.json();
+          const updatedFish = updatedFishes.find((f: Fish) => f.id === localFish.id);
+          if (updatedFish) {
+            setLocalFish(updatedFish);
+            onFishUpdate?.(updatedFish);
+          }
+        }
+        setShowImageUploadForm(false);
+      } else {
+        throw new Error('Failed to upload image');
+      }
+    } catch (error) {
+      console.error('Failed to add image:', error);
+    }
+  };
+
+  // Get all images (default + user images)
+  const allImages = localFish ? [
+    { id: 'default', url: localFish.image, caption: 'Official Image', isDefault: true, takenAt: undefined, createdAt: undefined },
+    ...(localFish.userImages || []).map(img => ({ 
+      id: img.id, 
+      url: img.imageUrl, 
+      caption: img.caption || 'User Image',
+      isDefault: false,
+      takenAt: img.takenAt,
+      createdAt: img.createdAt
+    }))
+  ] : [];
+
+  const currentImage = allImages[currentImageIndex] || { url: localFish?.image || '', caption: 'Image', isDefault: true, takenAt: undefined, createdAt: undefined };
+
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % allImages.length);
+  };
+
+  const prevImage = () => {
+    setCurrentImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
+  };
+
   if (!isOpen || !localFish || !mounted) {
     return null;
   }
@@ -107,18 +169,75 @@ export default function FishDetailModal({ fish, isOpen, onClose, onFishUpdate }:
           </svg>
         </button>
 
-        {/* Header with Fish Image */}
+        {/* Header with Fish Image Carousel */}
         <div className="relative">
           <div className="h-64 relative overflow-hidden rounded-t-lg">
             <Image
-              src={localFish.image}
+              src={currentImage.url}
               alt={localFish.name}
               fill
-              className="object-cover"
+              className="object-cover transition-opacity duration-300"
               sizes="(max-width: 768px) 100vw, 50vw"
               priority
+              onError={(e) => {
+                // Fallback to default image if user image fails to load
+                if (!currentImage.isDefault) {
+                  console.warn('Failed to load user image:', currentImage.url);
+                  setCurrentImageIndex(0); // Go back to default image
+                }
+              }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+            
+            {/* Image Navigation */}
+            {allImages.length > 1 && (
+              <>
+                <button
+                  onClick={prevImage}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                <button
+                  onClick={nextImage}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+                
+                {/* Image Counter */}
+                <div className="absolute top-2 right-2 bg-black/50 text-white px-2 py-1 rounded text-sm">
+                  {currentImageIndex + 1} / {allImages.length}
+                </div>
+              </>
+            )}
+
+            {/* Add Image Button */}
+            <button
+              onClick={() => setShowImageUploadForm(true)}
+              className="absolute bottom-2 right-2 bg-sonar-green hover:bg-sonar-green/80 text-deep-ocean p-2 rounded-full transition-colors shadow-lg"
+              title="Add Image"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+            </button>
+
+            {/* Image Caption */}
+            {currentImage.caption && (
+              <div className="absolute bottom-2 left-32 bg-black/50 text-white px-2 py-1 rounded text-sm max-w-xs">
+                {currentImage.caption}
+                {!currentImage.isDefault && currentImage.takenAt && (
+                  <div className="text-xs text-gray-300 mt-1">
+                    {formatDistanceToNow(new Date(currentImage.takenAt), { addSuffix: true })}
+                  </div>
+                )}
+              </div>
+            )}
             
             {/* Spotted Badge */}
             {localFish.isSpotted && (
@@ -266,6 +385,89 @@ export default function FishDetailModal({ fish, isOpen, onClose, onFishUpdate }:
                   <button
                     type="button"
                     onClick={() => setShowNewSightingForm(false)}
+                    className="px-4 py-2 bg-gray-600 hover:bg-gray-500 text-white rounded transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          {/* Image Upload Form */}
+          {showImageUploadForm && (
+            <div className="bg-gray-800/50 border border-sonar-green/30 rounded-lg p-4 space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-sonar-green">Add Image</h3>
+                <button
+                  onClick={() => setShowImageUploadForm(false)}
+                  className="text-gray-400 hover:text-white transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              
+              <form onSubmit={async (e) => {
+                e.preventDefault();
+                const formData = new FormData(e.currentTarget);
+                const imageUrl = formData.get('imageUrl') as string;
+                const caption = formData.get('caption') as string;
+                const takenAt = formData.get('takenAt') as string;
+                
+                await handleAddImage(
+                  imageUrl,
+                  caption || undefined,
+                  takenAt ? new Date(takenAt) : undefined
+                );
+              }} className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-text-secondary mb-1">
+                    Image URL *
+                  </label>
+                  <input
+                    type="url"
+                    name="imageUrl"
+                    required
+                    placeholder="https://example.com/image.jpg"
+                    className="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-white placeholder-gray-500 focus:border-sonar-green focus:outline-none"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-text-secondary mb-1">
+                    Caption (optional)
+                  </label>
+                  <input
+                    type="text"
+                    name="caption"
+                    placeholder="Describe this image..."
+                    className="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-white placeholder-gray-500 focus:border-sonar-green focus:outline-none"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-text-secondary mb-1">
+                    Photo Taken At (optional)
+                  </label>
+                  <input
+                    type="datetime-local"
+                    name="takenAt"
+                    className="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-white focus:border-sonar-green focus:outline-none"
+                  />
+                </div>
+                
+                <div className="flex gap-2 pt-2">
+                  <button
+                    type="submit"
+                    className="flex-1 bg-sonar-green hover:bg-sonar-green/80 text-deep-ocean font-medium py-2 px-4 rounded transition-colors"
+                  >
+                    Add Image
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowImageUploadForm(false)}
                     className="px-4 py-2 bg-gray-600 hover:bg-gray-500 text-white rounded transition-colors"
                   >
                     Cancel
