@@ -11,7 +11,10 @@ export interface Fish {
   };
   // User sighting information (populated based on current user)
   isSpotted?: boolean;
-  spottedAt?: string;
+  sightingCount?: number;
+  firstSpottedAt?: string;
+  lastSpottedAt?: string;
+  userSightings?: UserFishSighting[];
 }
 
 export type Rarity = "COMMON" | "RARE" | "EPIC";
@@ -23,6 +26,8 @@ export interface UserFishSighting {
   id: string;
   userId: string;
   fishId: string;
-  spottedAt: string;
+  latitude?: string;
+  longitude?: string;
+  sightingDate: string;
   createdAt: string;
 }

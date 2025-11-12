@@ -41,39 +41,36 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { fishId } = await request.json();
+    const { fishId, latitude, longitude, sightingDate } = await request.json();
+
+    console.log('Received sighting data:', { 
+      fishId, 
+      latitude, 
+      longitude, 
+      sightingDate,
+      latitudeType: typeof latitude,
+      longitudeType: typeof longitude,
+      latitudeEmpty: latitude === '',
+      longitudeEmpty: longitude === ''
+    });
 
     if (!fishId) {
       return NextResponse.json({ error: "Fish ID is required" }, { status: 400 });
     }
 
-    // Check if already spotted
-    const existing = await db
-      .select()
-      .from(userFishSighting)
-      .where(
-        and(
-          eq(userFishSighting.userId, session.user.id),
-          eq(userFishSighting.fishId, fishId)
-        )
-      )
-      .limit(1);
-
-    if (existing.length > 0) {
-      return NextResponse.json(
-        { error: "Fish already spotted by user" },
-        { status: 409 }
-      );
-    }
-
     const now = new Date();
+    const sightingDateParsed = sightingDate ? new Date(sightingDate) : now;
+
     const newSighting = await db
       .insert(userFishSighting)
       .values({
         id: crypto.randomUUID(),
         userId: session.user.id,
         fishId,
-        spottedAt: now,
+        latitude: latitude && !isNaN(latitude) ? String(latitude) : null,
+        longitude: longitude && !isNaN(longitude) ? String(longitude) : null,
+        sightingDate: sightingDateParsed,
+        spottedAt: sightingDateParsed, // Legacy field - use sightingDate for compatibility
         createdAt: now,
       })
       .returning();

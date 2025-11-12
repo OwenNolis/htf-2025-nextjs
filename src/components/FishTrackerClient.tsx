@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Fish } from "@/types/fish";
 import Map from "./Map";
 import FishList from "./FishList";
@@ -16,12 +16,37 @@ export default function FishTrackerClient({
   sortedFishes,
 }: FishTrackerClientProps) {
   const [hoveredFishId, setHoveredFishId] = useState<string | null>(null);
+  const [fishList, setFishList] = useState<Fish[]>(sortedFishes);
+  const [mounted, setMounted] = useState(false);
+
+  // Prevent hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const handleFishUpdate = (updatedFish: Fish) => {
+    setFishList(prevFishes =>
+      prevFishes.map(fish =>
+        fish.id === updatedFish.id ? updatedFish : fish
+      )
+    );
+  };
+
+  // Don't render until mounted to avoid hydration issues
+  if (!mounted) {
+    return (
+      <div className="flex-1 flex flex-col">
+        <div className="flex-1 bg-gray-800 animate-pulse" />
+        <div className="h-64 bg-gray-900 animate-pulse" />
+      </div>
+    );
+  }
 
   return (
     <PanelGroup
       direction="vertical"
       className="flex-1"
-      autoSaveId="fish-tracker-client"
+      id="fish-tracker-panels"
     >
       {/* Map Panel */}
       <Panel defaultSize={65} minSize={30}>
@@ -42,7 +67,11 @@ export default function FishTrackerClient({
 
       {/* Fish List Panel */}
       <Panel defaultSize={35} minSize={20}>
-        <FishList fishes={sortedFishes} onFishHover={setHoveredFishId} />
+        <FishList 
+          fishes={fishList} 
+          onFishHover={setHoveredFishId}
+          onFishUpdate={handleFishUpdate}
+        />
       </Panel>
     </PanelGroup>
   );

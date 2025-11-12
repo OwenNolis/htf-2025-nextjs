@@ -15,6 +15,13 @@
       "when": 1762944668309,
       "tag": "0001_loose_captain_midlands",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1762950660763,
+      "tag": "0002_wooden_loa",
+      "breakpoints": true
     }
   ]
 }

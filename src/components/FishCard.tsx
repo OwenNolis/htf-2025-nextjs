@@ -7,14 +7,20 @@ import Image from "next/image";
 interface FishCardProps {
   fish: Fish;
   onHover?: (fishId: string | null) => void;
+  onClick?: (fish: Fish) => void;
 }
 
-export default function FishCard({ fish, onHover }: FishCardProps) {
+export default function FishCard({ fish, onHover, onClick }: FishCardProps) {
+  const handleCardClick = () => {
+    onClick?.(fish);
+  };
+
   return (
     <div
       className="border border-panel-border shadow-[--shadow-cockpit-border] rounded-lg p-3 hover:border-sonar-green transition-all duration-300 cursor-pointer group"
       onMouseEnter={() => onHover?.(fish.id)}
       onMouseLeave={() => onHover?.(null)}
+      onClick={handleCardClick}
     >
       <div className="flex items-start justify-between mb-2">
         <div className="flex-1">

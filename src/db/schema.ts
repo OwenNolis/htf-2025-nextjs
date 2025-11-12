@@ -54,13 +54,16 @@ export const verification = sqliteTable("verification", {
   updatedAt: integer("updatedAt", { mode: "timestamp" }),
 });
 
-// User fish sightings table - stores which fish each user has marked as "spotted"
+// User fish sightings table - stores individual sightings with location data
 export const userFishSighting = sqliteTable("user_fish_sighting", {
   id: text("id").primaryKey(),
   userId: text("userId")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
   fishId: text("fishId").notNull(), // Fish ID from external API
-  spottedAt: integer("spottedAt", { mode: "timestamp" }).notNull(),
+  latitude: text("latitude"), // Optional: user-reported latitude as string for precision
+  longitude: text("longitude"), // Optional: user-reported longitude as string for precision
+  sightingDate: integer("sightingDate", { mode: "timestamp" }).notNull(), // Date of the sighting
+  spottedAt: integer("spottedAt", { mode: "timestamp" }), // Legacy field for migration compatibility
   createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
 });

@@ -5,6 +5,7 @@ import { Fish, FilterType } from "@/types/fish";
 import { fetchFishesWithSightings } from "@/lib/fish-with-sightings";
 import { useFishSightings } from "@/hooks/useFishSightings";
 import FishCard from "./FishCard";
+import FishDetailModal from "./FishDetailModal";
 
 export default function CatalogClient() {
   const [fishes, setFishes] = useState<Fish[]>([]);
@@ -13,6 +14,8 @@ export default function CatalogClient() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [hoveredFish, setHoveredFish] = useState<string | null>(null);
+  const [selectedFish, setSelectedFish] = useState<Fish | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { toggleSighting } = useFishSightings();
 
   useEffect(() => {
@@ -70,6 +73,24 @@ export default function CatalogClient() {
       // Error is already handled in the hook, but we can add toast notifications here if needed
       console.error("Failed to toggle fish sighting:", error);
     }
+  };
+
+  const handleFishClick = (fish: Fish) => {
+    setSelectedFish(fish);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedFish(null);
+  };
+
+  const handleFishModalUpdate = (updatedFish: Fish) => {
+    setFishes(prevFishes =>
+      prevFishes.map(fish =>
+        fish.id === updatedFish.id ? updatedFish : fish
+      )
+    );
   };
 
   const getFilterCounts = () => {
@@ -168,6 +189,7 @@ export default function CatalogClient() {
                 <FishCard 
                   fish={fish} 
                   onHover={setHoveredFish}
+                  onClick={handleFishClick}
                 />
                 {fish.isSpotted && (
                   <div className="absolute top-2 left-2 bg-sonar-green text-deep-ocean px-2 py-1 rounded-full text-xs font-bold flex items-center gap-1">
@@ -209,6 +231,14 @@ export default function CatalogClient() {
           ))}
         </div>
       )}
+
+      {/* Fish Detail Modal */}
+      <FishDetailModal
+        fish={selectedFish}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onFishUpdate={handleFishModalUpdate}
+      />
     </div>
   );
 }

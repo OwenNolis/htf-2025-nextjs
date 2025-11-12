@@ -120,14 +120,17 @@ const NewSightingForm: React.FC = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ fishId: formData.fishId }),
+                body: JSON.stringify({ 
+                    fishId: formData.fishId,
+                    latitude: formData.latitude || null,
+                    longitude: formData.longitude || null,
+                    sightingDate: formData.sightingDate
+                }),
             });
 
             if (!response.ok) {
                 if (response.status === 401) {
                     throw new Error('Please log in to save a sighting');
-                } else if (response.status === 409) {
-                    throw new Error('This fish has already been spotted');
                 } else {
                     throw new Error('Error saving the sighting');
                 }

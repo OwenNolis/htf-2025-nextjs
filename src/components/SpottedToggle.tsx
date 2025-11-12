@@ -19,7 +19,8 @@ export default function SpottedToggle({ fish, onToggle, size = "md" }: SpottedTo
     setIsSpotted(fish.isSpotted || false);
   }, [fish.isSpotted]);
 
-  const handleToggle = async () => {
+  const handleToggle = async (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click when toggling
     try {
       const newSpottedState = await toggleSighting(fish.id, isSpotted);
       setIsSpotted(newSpottedState);

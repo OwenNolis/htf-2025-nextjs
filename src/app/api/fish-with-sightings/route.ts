@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { userFishSighting } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { Fish } from "@/types/fish";
+import { Fish, UserFishSighting } from "@/types/fish";
 
 export async function GET(request: NextRequest) {
   try {
@@ -28,17 +28,55 @@ export async function GET(request: NextRequest) {
           .from(userFishSighting)
           .where(eq(userFishSighting.userId, session.user.id));
 
-        // Create a map for quick lookup
-        const sightingsMap = new Map(
-          userSightings.map(s => [s.fishId, s])
-        );
+        // Group sightings by fishId and handle both old and new formats
+        const sightingsMap = new Map<string, UserFishSighting[]>();
+        userSightings.forEach(sighting => {
+          const fishId = sighting.fishId;
+          if (!sightingsMap.has(fishId)) {
+            sightingsMap.set(fishId, []);
+          }
+          
+          // Handle both old and new schema formats
+          const sightingDate = sighting.sightingDate || sighting.spottedAt;
+          
+          sightingsMap.get(fishId)!.push({
+            id: sighting.id,
+            userId: sighting.userId,
+            fishId: sighting.fishId,
+            latitude: sighting.latitude || undefined,
+            longitude: sighting.longitude || undefined,
+            sightingDate: sightingDate?.toISOString() || new Date().toISOString(),
+            createdAt: sighting.createdAt.toISOString(),
+          });
+        });
 
         // Merge fish data with sighting status
-        const fishesWithSightings = fishes.map(fish => ({
-          ...fish,
-          isSpotted: sightingsMap.has(fish.id),
-          spottedAt: sightingsMap.get(fish.id)?.spottedAt?.toISOString(),
-        }));
+        const fishesWithSightings = fishes.map(fish => {
+          const fishSightings = sightingsMap.get(fish.id) || [];
+          const isSpotted = fishSightings.length > 0;
+          
+          if (isSpotted) {
+            // Sort sightings by date to get first and last
+            const sortedSightings = [...fishSightings].sort((a, b) => 
+              new Date(a.sightingDate).getTime() - new Date(b.sightingDate).getTime()
+            );
+            
+            return {
+              ...fish,
+              isSpotted: true,
+              sightingCount: fishSightings.length,
+              firstSpottedAt: sortedSightings[0].sightingDate,
+              lastSpottedAt: sortedSightings[sortedSightings.length - 1].sightingDate,
+              userSightings: fishSightings,
+            };
+          } else {
+            return {
+              ...fish,
+              isSpotted: false,
+              sightingCount: 0,
+            };
+          }
+        });
 
         return NextResponse.json(fishesWithSightings);
       }

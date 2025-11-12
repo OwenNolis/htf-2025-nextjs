@@ -5,6 +5,7 @@ import Map, { MapRef } from "react-map-gl/maplibre";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { Fish } from "@/types/fish";
 import FishMarker from "./FishMarker";
+import UserSightingMarker from "./UserSightingMarker";
 
 interface MapComponentProps {
   fishes: Fish[];
@@ -60,6 +61,19 @@ export default function MapComponent({
             isAnyHovered={isAnyHovered}
           />
         ))}
+
+        {/* User sighting markers */}
+        {fishes.map((fish) => 
+          fish.userSightings?.map((sighting, index) => (
+            <UserSightingMarker
+              key={`${fish.id}-${sighting.id}`}
+              sighting={sighting}
+              fishName={fish.name}
+              fishRarity={fish.rarity}
+              sightingNumber={fish.userSightings!.length - index}
+            />
+          ))
+        )}
       </Map>
 
       {/* Coordinate display overlay */}
