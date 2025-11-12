@@ -3,13 +3,14 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Fish } from "@/types/fish";
+import { Achievement } from "@/types/achievement";
 import FishCard from "./FishCard";
 import FishDetailModal from "./FishDetailModal";
 
 interface FishListProps {
   fishes: Fish[];
   onFishHover: (fishId: string | null) => void;
-  onFishUpdate?: (updatedFish: Fish) => void;
+  onFishUpdate?: (updatedFish: Fish, newAchievements?: Achievement[]) => void;
 }
 
 export default function FishList({ fishes, onFishHover, onFishUpdate }: FishListProps) {
@@ -26,8 +27,8 @@ export default function FishList({ fishes, onFishHover, onFishUpdate }: FishList
     setSelectedFish(null);
   };
 
-  const handleFishModalUpdate = (updatedFish: Fish) => {
-    onFishUpdate?.(updatedFish);
+  const handleFishModalUpdate = (updatedFish: Fish, newAchievements?: Achievement[]) => {
+    onFishUpdate?.(updatedFish, newAchievements);
   };
   return (
     <div className="w-full h-full bg-[color-mix(in_srgb,var(--color-dark-navy)_85%,transparent)] border-2 border-panel-border shadow-[--shadow-cockpit] backdrop-blur-[10px] overflow-hidden flex flex-col">

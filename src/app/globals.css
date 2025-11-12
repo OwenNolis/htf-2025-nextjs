@@ -6,10 +6,10 @@
   --color-deep-ocean: #0a1628;
   --color-dark-navy: #0d1b2a;
   --color-nautical-blue: #1b263b;
-  --color-ocean-teal: #0d7377;
-  --color-sonar-green: #14ffec;
-  --color-warning-amber: #ffa500;
-  --color-danger-red: #ff4757;
+  --color-ocean-teal: #52ccca;
+  --color-sonar-green: #52ccca;
+  --color-warning-amber: #f5ca53;
+  --color-danger-red: #ee9836;
   --color-panel-border: #2d4059;
   --color-text-primary: #e0e1dd;
   --color-text-secondary: #a8dadc;
@@ -29,16 +29,16 @@
   --animate-scanline: scanline;
 
   /* Custom shadows for cockpit panels */
-  --shadow-cockpit: 0 0 20px color-mix(in srgb, #14ffec 10%, transparent),
+  --shadow-cockpit: 0 0 20px color-mix(in srgb, #52ccca 10%, transparent),
     inset 0 0 20px color-mix(in srgb, black 50%, transparent);
-  --shadow-cockpit-border: 0 0 10px color-mix(in srgb, #14ffec 15%, transparent),
+  --shadow-cockpit-border: 0 0 10px color-mix(in srgb, #52ccca 15%, transparent),
     inset 0 0 10px color-mix(in srgb, black 30%, transparent);
-  --shadow-map-panel: 0 4px 20px color-mix(in srgb, #14ffec 10%, transparent);
-  --shadow-glow-common: 0 0 5px #14ffec;
-  --shadow-glow-rare: 0 0 5px #ffa500;
-  --shadow-glow-epic: 0 0 5px #ff4757;
+  --shadow-map-panel: 0 4px 20px color-mix(in srgb, #52ccca 10%, transparent);
+  --shadow-glow-common: 0 0 5px #52ccca;
+  --shadow-glow-rare: 0 0 5px #f5ca53;
+  --shadow-glow-epic: 0 0 5px #ee9836;
   --shadow-marker: 0 0 10px currentColor;
-  --shadow-glow-text: 0 0 5px #14ffec, 0 0 10px #14ffec;
+  --shadow-glow-text: 0 0 5px #f5ca53, 0 0 10px #f5ca53;
 }
 
 @keyframes ping-common {
@@ -94,7 +94,7 @@
 body {
   background: linear-gradient(
     180deg,
-    var(--color-deep-ocean) 0%,
+    #52ccca 0%,
     var(--color-dark-navy) 100%
   );
   color: var(--color-foreground);

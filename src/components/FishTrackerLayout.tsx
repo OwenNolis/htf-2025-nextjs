@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { UserInfo } from "./AuthProvider";
 import FishTrackerClient from "./FishTrackerClient";
 import { Fish } from "@/types/fish";
@@ -10,7 +11,7 @@ interface FishTrackerLayoutProps {
   sortedFishes: Fish[];
 }
 
-// Fish Tracker Page
+// Fin Findr Page
 export default function FishTrackerLayout({ fishes, sortedFishes }: FishTrackerLayoutProps) {
   return (
     <div className="w-full h-screen flex flex-col relative overflow-hidden">
@@ -18,22 +19,47 @@ export default function FishTrackerLayout({ fishes, sortedFishes }: FishTrackerL
       <div className="fixed top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-[color-mix(in_srgb,var(--color-sonar-green)_10%,transparent)] to-transparent animate-scanline pointer-events-none z-[9999]"></div>
 
       {/* Header */}
-      <div className="bg-[color-mix(in_srgb,var(--color-dark-navy)_85%,transparent)] border-2 border-panel-border shadow-[--shadow-cockpit] backdrop-blur-[10px] px-6 py-3 border-b-2 border-panel-border flex items-center justify-between z-10">
+      <div className="bg-[color-mix(in_srgb,var(--color-dark-navy)_85%,transparent)] border-2 border-panel-border shadow-[--shadow-cockpit] backdrop-blur-[10px] px-6 py-2 border-b-2 border-panel-border flex items-center justify-between z-10">
         <div className="flex items-center gap-4">
-          <div className="text-2xl font-bold [text-shadow:--shadow-glow-text] text-sonar-green">
-            FISH TRACKER
-          </div>
-          <div className="text-xs text-text-secondary font-mono">
-            GLOBAL MARINE MONITORING SYSTEM
+          <div className="flex items-center gap-3">
+            <Image
+              src="/fish.png"
+              alt="Fin Findr Logo"
+              width={56}
+              height={56}
+              className="object-contain"
+            />
+            <div className="flex flex-col">
+              <div 
+                className="text-2xl font-bold [text-shadow:--shadow-glow-text]"
+                style={{ color: "#f5ca53" }}
+              >
+                FIN FINDR
+              </div>
+              <div 
+                className="text-xs font-mono -mt-1"
+                style={{ color: "#f5ca53" }}
+              >
+                YOUR WAY TO FIND FINS
+              </div>
+            </div>
           </div>
 
-          {/* 🐠 Catalog Link */}
-          <Link
-            href="/catalog"
-            className="text-xs font-mono text-sonar-green hover:text-sonar-light transition-colors border border-panel-border rounded px-2 py-1 shadow-[--shadow-cockpit-border]"
-          >
-            CATALOG
-          </Link>
+          {/* Navigation Links */}
+          <div className="flex gap-2">
+            <Link
+              href="/catalog"
+              className="text-xs font-mono text-sonar-green hover:text-sonar-light transition-colors border border-panel-border rounded px-2 py-1 shadow-[--shadow-cockpit-border]"
+            >
+              CATALOG
+            </Link>
+            <Link
+              href="/achievements"
+              className="text-xs font-mono text-warning-amber hover:text-warning-amber/80 transition-colors border border-panel-border rounded px-2 py-1 shadow-[--shadow-cockpit-border] flex items-center gap-1"
+            >
+              🏆 ACHIEVEMENTS
+            </Link>
+          </div>
         </div>
 
         <div className="flex items-center gap-4 text-xs font-mono">

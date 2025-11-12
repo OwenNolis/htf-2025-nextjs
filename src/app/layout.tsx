@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Fishy",
-  description: "Fishy is a fish tracking app",
+  title: "Fin Findr",
+  description: "Your way to find fins - A comprehensive fish tracking and species catalog application",
 };
 
 export default function RootLayout({

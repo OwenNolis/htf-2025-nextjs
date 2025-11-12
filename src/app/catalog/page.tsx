@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import CatalogClient from "@/components/CatalogClient";
 
 // Catalog Page
@@ -28,9 +29,29 @@ export default function CatalogPage() {
         </Link>
       </div>
 
-      <h1 className="text-3xl font-bold text-sonar-green mb-8 text-center">
-        Fish Species Catalog
-      </h1>
+      <div className="flex items-center justify-center mb-8">
+        <Image
+          src="/fish.png"
+          alt="Fin Findr Logo"
+          width={48}
+          height={48}
+          className="object-contain mr-4"
+        />
+        <div className="text-center">
+          <h1 
+            className="text-3xl font-bold"
+            style={{ color: "#f5ca53" }}
+          >
+            FIN FINDR CATALOG
+          </h1>
+          <p 
+            className="text-sm font-mono mt-1"
+            style={{ color: "#f5ca53" }}
+          >
+            YOUR WAY TO FIND FINS
+          </p>
+        </div>
+      </div>
 
       <CatalogClient />
     </main>

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { Fish } from "@/types/fish";
+import { Achievement } from "@/types/achievement";
 import { getRarityBadgeClass } from "@/utils/rarity";
 import { formatDistanceToNow } from "date-fns";
 import Image from "next/image";
@@ -13,7 +14,7 @@ interface FishDetailModalProps {
   fish: Fish | null;
   isOpen: boolean;
   onClose: () => void;
-  onFishUpdate?: (updatedFish: Fish) => void;
+  onFishUpdate?: (updatedFish: Fish, newAchievements?: Achievement[]) => void;
 }
 
 export default function FishDetailModal({ fish, isOpen, onClose, onFishUpdate }: FishDetailModalProps) {
@@ -66,7 +67,7 @@ export default function FishDetailModal({ fish, isOpen, onClose, onFishUpdate }:
     if (!localFish) return;
     
     try {
-      await addSighting(localFish.id, latitude, longitude, sightingDate);
+      const result = await addSighting(localFish.id, latitude, longitude, sightingDate);
       
       // Refresh the fish data by fetching updated information
       const response = await fetch('/api/fish-with-sightings');
@@ -75,7 +76,7 @@ export default function FishDetailModal({ fish, isOpen, onClose, onFishUpdate }:
         const updatedFish = updatedFishes.find((f: Fish) => f.id === localFish.id);
         if (updatedFish) {
           setLocalFish(updatedFish);
-          onFishUpdate?.(updatedFish);
+          onFishUpdate?.(updatedFish, result.newAchievements);
         }
       }
       
@@ -252,7 +253,10 @@ export default function FishDetailModal({ fish, isOpen, onClose, onFishUpdate }:
 
             {/* Fish Name and Rarity */}
             <div className="absolute bottom-4 left-4 right-16">
-              <h2 className="text-2xl font-bold text-white mb-2 drop-shadow-lg">
+              <h2 
+                className="text-2xl font-bold mb-2 drop-shadow-lg"
+                style={{ color: "#ee9836" }}
+              >
                 {localFish.name}
               </h2>
               <div

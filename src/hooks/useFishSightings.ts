@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { Achievement } from "@/types/achievement";
 
 interface UseFishSightingsReturn {
-  toggleSighting: (fishId: string, isCurrentlySpotted: boolean) => Promise<boolean>;
-  addSighting: (fishId: string, latitude?: number, longitude?: number, sightingDate?: Date) => Promise<boolean>;
+  toggleSighting: (fishId: string, isCurrentlySpotted: boolean) => Promise<{ success: boolean; newAchievements?: Achievement[] }>;
+  addSighting: (fishId: string, latitude?: number, longitude?: number, sightingDate?: Date) => Promise<{ success: boolean; newAchievements?: Achievement[] }>;
   isLoading: boolean;
   error: string | null;
 }
@@ -13,12 +14,28 @@ export function useFishSightings(): UseFishSightingsReturn {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const checkAchievements = async (): Promise<Achievement[]> => {
+    try {
+      const response = await fetch('/api/achievements/check', {
+        method: 'POST',
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return data.newlyUnlocked || [];
+      }
+    } catch (error) {
+      console.error('Error checking achievements:', error);
+    }
+    return [];
+  };
+
   const addSighting = async (
     fishId: string, 
     latitude?: number, 
     longitude?: number, 
     sightingDate?: Date
-  ): Promise<boolean> => {
+  ): Promise<{ success: boolean; newAchievements?: Achievement[] }> => {
     setIsLoading(true);
     setError(null);
 
@@ -37,7 +54,9 @@ export function useFishSightings(): UseFishSightingsReturn {
       });
 
       if (response.ok) {
-        return true;
+        // Check for new achievements after adding sighting
+        const newAchievements = await checkAchievements();
+        return { success: true, newAchievements };
       } else if (response.status === 401) {
         throw new Error('Please log in to mark fish as spotted');
       } else {
@@ -51,15 +70,14 @@ export function useFishSightings(): UseFishSightingsReturn {
     }
   };
 
-  const toggleSighting = async (fishId: string, currentlySpotted: boolean): Promise<boolean> => {
+  const toggleSighting = async (fishId: string, currentlySpotted: boolean): Promise<{ success: boolean; newAchievements?: Achievement[] }> => {
     if (!currentlySpotted) {
-      // Add a new sighting
-      await addSighting(fishId);
-      return true;
+      // Add a new sighting and check for achievements
+      return await addSighting(fishId);
     } else {
       // For now, don't remove sightings when "untoggling"
       // You already have sightings, so return true
-      return true;
+      return { success: true };
     }
   };
 

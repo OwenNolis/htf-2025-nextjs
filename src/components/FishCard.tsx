@@ -24,7 +24,10 @@ export default function FishCard({ fish, onHover, onClick }: FishCardProps) {
     >
       <div className="flex items-start justify-between mb-2">
         <div className="flex-1">
-          <div className="text-sm font-bold text-text-primary group-hover:text-sonar-green transition-colors mb-1">
+          <div 
+            className="text-sm font-bold group-hover:text-sonar-green transition-colors mb-1"
+            style={{ color: "#ee9836" }}
+          >
             {fish.name}
           </div>
           <div

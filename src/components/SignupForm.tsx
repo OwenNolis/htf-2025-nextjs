@@ -4,6 +4,7 @@ import { useState } from "react";
 import { signUp } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function SignupForm() {
   const router = useRouter();
@@ -37,9 +38,29 @@ export default function SignupForm() {
 
   return (
     <div className="w-full max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
-        Create Account
-      </h2>
+      <div className="flex items-center justify-center mb-6">
+        <Image
+          src="/fish.png"
+          alt="Fin Findr Logo"
+          width={40}
+          height={40}
+          className="object-contain mr-3"
+        />
+        <div className="text-center">
+          <h2 
+            className="text-2xl font-bold"
+            style={{ color: "#f5ca53" }}
+          >
+            FIN FINDR
+          </h2>
+          <p 
+            className="text-xs font-mono"
+            style={{ color: "#f5ca53" }}
+          >
+            YOUR WAY TO FIND FINS
+          </p>
+        </div>
+      </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>

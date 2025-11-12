@@ -80,3 +80,15 @@ export const userFishImage = sqliteTable("user_fish_image", {
   takenAt: integer("takenAt", { mode: "timestamp" }), // When the photo was taken
   createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
 });
+
+// User achievements table - stores unlocked achievements for users
+export const userAchievement = sqliteTable("user_achievement", {
+  id: text("id").primaryKey(),
+  userId: text("userId")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  achievementId: text("achievementId").notNull(), // Achievement ID from predefined list
+  progress: integer("progress").default(0), // Current progress towards achievement (optional)
+  unlockedAt: integer("unlockedAt", { mode: "timestamp" }).notNull(), // When achievement was unlocked
+  createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
+});

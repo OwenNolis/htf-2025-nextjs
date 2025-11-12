@@ -14,11 +14,11 @@ export const getRarityOrder = (rarity: string): number => {
 export const getRarityColor = (rarity: string): string => {
   switch (rarity.toUpperCase()) {
     case "RARE":
-      return "var(--warning-amber)";
+      return "var(--color-warning-amber)";
     case "EPIC":
-      return "var(--danger-red)";
+      return "var(--color-danger-red)";
     default:
-      return "var(--sonar-green)";
+      return "var(--color-sonar-green)";
   }
 };
 
