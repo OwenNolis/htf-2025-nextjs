@@ -74,7 +74,7 @@ const NewSightingForm: React.FC = () => {
                 }
             } catch (e) {
                 if (e instanceof Error) {
-                    setError(`Fout bij het ophalen van de vissenlijst: ${e.message}. Zorg ervoor dat de API draait op poort 5555.`);
+                    setError(`Error fetching fish list: ${e.message}. Make sure the API is running on port 5555.`);
                 }
             } finally {
                 setLoading(false);
@@ -113,22 +113,28 @@ const NewSightingForm: React.FC = () => {
             longitude: formData.longitude !== '' ? formData.longitude : null,
         };
 
-        // Simuleer een API-oproep (vervang door je echte backend-logica)
+        // Submit to our internal user sightings API
         try {
-            const response = await fetch('http://localhost:5555/api/sightings', {
+            const response = await fetch('/api/user-sightings', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(payload),
+                body: JSON.stringify({ fishId: formData.fishId }),
             });
 
             if (!response.ok) {
-                throw new Error('Fout bij het opslaan van de waarneming');
+                if (response.status === 401) {
+                    throw new Error('Please log in to save a sighting');
+                } else if (response.status === 409) {
+                    throw new Error('This fish has already been spotted');
+                } else {
+                    throw new Error('Error saving the sighting');
+                }
             }
 
             setSubmitStatus('success');
-            // Reset de locatievelden na succes
+            // Reset the form after success
             setFormData({
                 fishId: formData.fishId,
                 latitude: '',
@@ -138,37 +144,42 @@ const NewSightingForm: React.FC = () => {
 
         } catch (e) {
             console.error(e);
+            if (e instanceof Error) {
+                setError(e.message);
+            } else {
+                setError('An unexpected error occurred');
+            }
             setSubmitStatus('error');
         } finally {
-            // Reset de status na 2 seconden
+            // Reset status after 2 seconds
             setTimeout(() => setSubmitStatus('idle'), 2000);
         }
     };
 
     // Render logica
     if (loading) {
-        return <p>Laden van vissoorten...</p>;
+        return <p>Loading fish species...</p>;
     }
 
     if (error) {
         return <div style={{ color: 'red' }}>{error}</div>;
     }
 
-    // Bepaal de status van de GeoLocation knop
+    // Determine the status of the GeoLocation button
     const geoButtonText =
-        geoStatus === 'loading' ? 'Locatie Ophalen...' :
-            geoStatus === 'success' ? 'Opgeslagen!' :
-                geoStatus === 'error' ? 'Fout Locatie' :
-                    'Huidige Locatie Gebruiken';
+        geoStatus === 'loading' ? 'Getting Location...' :
+            geoStatus === 'success' ? 'Saved!' :
+                geoStatus === 'error' ? 'Location Error' :
+                    'Use Current Location';
 
     return (
         <div style={{ maxWidth: '400px', margin: '0 auto', padding: '20px', border: '1px solid #ccc', borderRadius: '8px' }}>
-            <h2>Registreer Nieuwe Waarneming 📍</h2>
+            <h2>Register New Sighting 📍</h2>
             <form onSubmit={handleSubmit}>
 
-                {/* Vissoort Selectie */}
+                {/* Fish Species Selection */}
                 <div style={{ marginBottom: '15px' }}>
-                    <label htmlFor="fishId" style={{ display: 'block', marginBottom: '5px' }}>Vissoort:</label>
+                    <label htmlFor="fishId" style={{ display: 'block', marginBottom: '5px' }}>Fish Species:</label>
                     <select
                         id="fishId"
                         name="fishId"
@@ -185,9 +196,9 @@ const NewSightingForm: React.FC = () => {
                     </select>
                 </div>
 
-                {/* Locatie Velden (Breedtegraad & Lengtegraad) */}
+                {/* Location Fields (Latitude & Longitude) */}
                 <div style={{ marginBottom: '15px', display: 'flex', gap: '10px', flexDirection: 'column' }}>
-                    <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Locatie Coördinaten:</label>
+                    <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Location Coordinates:</label>
 
                     {/* GeoLocation Button */}
                     <button
@@ -210,7 +221,7 @@ const NewSightingForm: React.FC = () => {
                     <div style={{ display: 'flex', gap: '10px' }}>
                         {/* Latitude */}
                         <div style={{ flex: 1 }}>
-                            <label htmlFor="latitude" style={{ display: 'block', marginBottom: '5px', fontSize: '12px' }}>Breedtegraad (Latitude):</label>
+                            <label htmlFor="latitude" style={{ display: 'block', marginBottom: '5px', fontSize: '12px' }}>Latitude:</label>
                             <input
                                 type="number"
                                 id="latitude"
@@ -218,7 +229,7 @@ const NewSightingForm: React.FC = () => {
                                 step="0.000001"
                                 value={formData.latitude}
                                 onChange={handleChange}
-                                placeholder="Bijv. 52.3702"
+                                placeholder="e.g. 52.3702"
                                 required
                                 style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}
                             />
@@ -226,7 +237,7 @@ const NewSightingForm: React.FC = () => {
 
                         {/* Longitude */}
                         <div style={{ flex: 1 }}>
-                            <label htmlFor="longitude" style={{ display: 'block', marginBottom: '5px', fontSize: '12px' }}>Lengtegraad (Longitude):</label>
+                            <label htmlFor="longitude" style={{ display: 'block', marginBottom: '5px', fontSize: '12px' }}>Longitude:</label>
                             <input
                                 type="number"
                                 id="longitude"
@@ -234,7 +245,7 @@ const NewSightingForm: React.FC = () => {
                                 step="0.000001"
                                 value={formData.longitude}
                                 onChange={handleChange}
-                                placeholder="Bijv. 4.8952"
+                                placeholder="e.g. 4.8952"
                                 required
                                 style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}
                             />
@@ -242,9 +253,9 @@ const NewSightingForm: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Datum Veld */}
+                {/* Date Field */}
                 <div style={{ marginBottom: '20px' }}>
-                    <label htmlFor="sightingDate" style={{ display: 'block', marginBottom: '5px' }}>Datum van Waarneming:</label>
+                    <label htmlFor="sightingDate" style={{ display: 'block', marginBottom: '5px' }}>Sighting Date:</label>
                     <input
                         type="date"
                         id="sightingDate"
@@ -252,12 +263,12 @@ const NewSightingForm: React.FC = () => {
                         value={formData.sightingDate}
                         onChange={handleChange}
                         required
-                        max={new Date().toISOString().substring(0, 10)} // Kan niet in de toekomst zijn
+                        max={new Date().toISOString().substring(0, 10)} // Cannot be in the future
                         style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}
                     />
                 </div>
 
-                {/* Indienen Knop */}
+                {/* Submit Button */}
                 <button
                     type="submit"
                     disabled={submitStatus !== 'idle'}
@@ -271,7 +282,7 @@ const NewSightingForm: React.FC = () => {
                         cursor: submitStatus === 'idle' ? 'pointer' : 'not-allowed',
                     }}
                 >
-                    {submitStatus === 'submitting' ? 'Opslaan...' : submitStatus === 'success' ? 'Opgeslagen! 🎉' : 'Waarneming Opslaan'}
+                    {submitStatus === 'submitting' ? 'Saving...' : submitStatus === 'success' ? 'Saved! 🎉' : 'Save Sighting'}
                 </button>
 
                 {/* Statusberichten */}

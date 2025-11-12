@@ -1,6 +1,8 @@
 import { formatDistanceToNow } from "date-fns";
 import { Fish } from "@/types/fish";
 import { getRarityBadgeClass } from "@/utils/rarity";
+import SpottedToggle from "./SpottedToggle";
+import Image from "next/image";
 
 interface FishCardProps {
   fish: Fish;
@@ -27,7 +29,24 @@ export default function FishCard({ fish, onHover }: FishCardProps) {
             {fish.rarity}
           </div>
         </div>
+        <div className="ml-2 flex-shrink-0">
+          <SpottedToggle fish={fish} size="sm" />
+        </div>
       </div>
+      
+      {/* Fish Image */}
+      <div className="mb-3">
+        <div className="relative w-full h-32 rounded-md overflow-hidden bg-gray-800">
+          <Image
+            src={fish.image}
+            alt={fish.name}
+            fill
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+        </div>
+      </div>
+      
       <div className="text-xs font-mono space-y-1">
         <div className="flex justify-between text-text-secondary">
           <span>LAT:</span>
