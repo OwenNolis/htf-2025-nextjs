@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Fish } from "@/types/fish";
 import { fetchFishes } from "@/api/fish";
 
+// Catalog Page
 export default async function CatalogPage() {
   // Fetch fish from Fishy Dex API
   let fishes: Fish[];

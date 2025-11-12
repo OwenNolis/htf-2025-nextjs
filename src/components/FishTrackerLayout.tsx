@@ -10,6 +10,7 @@ interface FishTrackerLayoutProps {
   sortedFishes: Fish[];
 }
 
+// Fish Tracker Page
 export default function FishTrackerLayout({ fishes, sortedFishes }: FishTrackerLayoutProps) {
   return (
     <div className="w-full h-screen flex flex-col relative overflow-hidden">

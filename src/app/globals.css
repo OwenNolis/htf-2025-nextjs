@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+/* Entire CSS */
 @theme inline {
   /* Color palette */
   --color-deep-ocean: #0a1628;
