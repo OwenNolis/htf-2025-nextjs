@@ -159,11 +159,11 @@ export default function FishDetailModal({ fish, isOpen, onClose, onFishUpdate }:
       />
       
       {/* Modal Content */}
-      <div className="relative bg-panel-bg border border-panel-border shadow-[--shadow-cockpit-border] rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto z-10">
+      <div className="relative bg-gray-800 border border-gray-600 shadow-[--shadow-cockpit-border] rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto z-10">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 p-2 rounded-full bg-gray-800/80 hover:bg-gray-700 transition-colors"
+          className="absolute top-4 right-4 z-10 p-2 rounded-full bg-gray-900/80 hover:bg-gray-700 transition-colors"
         >
           <svg className="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
