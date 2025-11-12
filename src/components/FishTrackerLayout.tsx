@@ -61,7 +61,7 @@ export default function FishTrackerLayout({ fishes, sortedFishes }: FishTrackerL
             </Link>
             <Link
               href="/leaderboard"
-              className="text-xs font-mono text-fin-findr-teal hover:text-fin-findr-teal/80 transition-colors border border-panel-border rounded px-2 py-1 shadow-[--shadow-cockpit-border] flex items-center gap-1"
+              className="text-xs font-mono text-green-500 hover:text-green-400 transition-colors border border-panel-border rounded px-2 py-1 shadow-[--shadow-cockpit-border] flex items-center gap-1"
             >
               📊 LEADERBOARD
             </Link>
