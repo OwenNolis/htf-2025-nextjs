@@ -3,19 +3,19 @@
 /* Entire CSS */
 @theme inline {
   /* Color palette */
-  --color-deep-ocean: #0a1628;
-  --color-dark-navy: #0d1b2a;
-  --color-nautical-blue: #1b263b;
+  --color-deep-ocean: #ffffff;
+  --color-dark-navy: #f8f9fa;
+  --color-nautical-blue: #e9ecef;
   --color-ocean-teal: #52ccca;
   --color-sonar-green: #52ccca;
   --color-warning-amber: #f5ca53;
   --color-danger-red: #ee9836;
-  --color-panel-border: #2d4059;
-  --color-text-primary: #e0e1dd;
-  --color-text-secondary: #a8dadc;
+  --color-panel-border: #d0d7de;
+  --color-text-primary: #24292f;
+  --color-text-secondary: #656d76;
 
   /* Semantic colors */
-  --color-background: #0a1628;
+  --color-background: #ffffff;
   --color-foreground: #e0e1dd;
 
   /* Font families */
