@@ -53,3 +53,14 @@ export const verification = sqliteTable("verification", {
   createdAt: integer("createdAt", { mode: "timestamp" }),
   updatedAt: integer("updatedAt", { mode: "timestamp" }),
 });
+
+// User fish sightings table - stores which fish each user has marked as "spotted"
+export const userFishSighting = sqliteTable("user_fish_sighting", {
+  id: text("id").primaryKey(),
+  userId: text("userId")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  fishId: text("fishId").notNull(), // Fish ID from external API
+  spottedAt: integer("spottedAt", { mode: "timestamp" }).notNull(),
+  createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
+});
