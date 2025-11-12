@@ -29,6 +29,13 @@
       "when": 1762957330566,
       "tag": "0003_lively_tag",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1762958695040,
+      "tag": "0004_clumsy_true_believers",
+      "breakpoints": true
     }
   ]
 }

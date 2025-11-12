@@ -59,6 +59,12 @@ export default function FishTrackerLayout({ fishes, sortedFishes }: FishTrackerL
             >
               🏆 ACHIEVEMENTS
             </Link>
+            <Link
+              href="/leaderboard"
+              className="text-xs font-mono text-fin-findr-teal hover:text-fin-findr-teal/80 transition-colors border border-panel-border rounded px-2 py-1 shadow-[--shadow-cockpit-border] flex items-center gap-1"
+            >
+              📊 LEADERBOARD
+            </Link>
           </div>
         </div>
 

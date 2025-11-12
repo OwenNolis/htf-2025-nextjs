@@ -92,3 +92,17 @@ export const userAchievement = sqliteTable("user_achievement", {
   unlockedAt: integer("unlockedAt", { mode: "timestamp" }).notNull(), // When achievement was unlocked
   createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
 });
+
+// User friends table - stores friend relationships between users
+export const userFriend = sqliteTable("user_friend", {
+  id: text("id").primaryKey(),
+  userId: text("userId")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  friendUserId: text("friendUserId")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  status: text("status").notNull().default("pending"), // pending, accepted, blocked
+  createdAt: integer("createdAt", { mode: "timestamp" }).notNull(),
+  updatedAt: integer("updatedAt", { mode: "timestamp" }).notNull(),
+});
